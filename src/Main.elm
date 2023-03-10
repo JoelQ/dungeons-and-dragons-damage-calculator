@@ -7,9 +7,5 @@ import Html.Attributes
 main : Html a
 main =
     Html.section []
-        [ Html.h1 [] [ Html.text "Minimal Elm + Parcel implementation, deployed to Netlify" ]
-        , Html.p []
-            [ Html.text "Find the source on "
-            , Html.a [ Html.Attributes.href "https://github.com/JoelQ/elm-netlify-parcel" ] [ Html.text "GitHub" ]
-            ]
+        [ Html.h1 [] [ Html.text "D&D damage dice roller" ]
         ]

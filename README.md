@@ -1,21 +1,15 @@
-# Minimal Elm + Parcel deploy to Netlify
+# D&D damage Dice roller
 
-[![Netlify Status](https://api.netlify.com/api/v1/badges/9429c584-fc7a-4812-9ebb-df8a3ae3ca92/deploy-status)](https://app.netlify.com/sites/elm-netlify-parcel/deploys) [![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/JoelQ/elm-netlify-parcel)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/db9e4ad6-8eb5-4e23-89a4-bee8f3485bbf/deploy-status)](https://app.netlify.com/sites/dnd-damage-roller/deploys) [![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/JoelQ/dungeons-and-dragons-damage-calculator)
 
-This is a minimal example [Elm](https://elm-lang.org) app that is deployed to
-[Netlify](https://www.netlify.com/) (see the [live site](https://elm-netlify-parcel.netlify.app/)).
+See the [live site] (https://dnd-damage-roller.netlify.app/)).
 
-## Using this yourself
+## Running locally:
 
-This is a [GitHub template repository](https://docs.github.com/en/free-pro-team@latest/github/creating-cloning-and-archiving-repositories/creating-a-repository-from-a-template)
-which allows you to initialize your own repo with the same files and directories
-as this (but not the history). To start using, click the big "Use this template"
-button at the top of the page.
-
-## Setup without parcel
-
-Looking for something more minimal that doesn't involve Parcel? Checkout the
-[sister `elm-netlify-minimal` project](https://github.com/JoelQ/elm-netlify-minimal).
+1. Clone the repo
+2. Install dependencies with `yarn`
+3. Run a local dev server with `yarn parcel serve src/index.html`
+4. Visit localhost:1234
 
 ## License
 
