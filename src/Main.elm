@@ -7,10 +7,11 @@ import Html.Attributes
 
 main : Program Flags Model Msg
 main =
-    Browser.sandbox
-        { init = initialModel
+    Browser.element
+        { init = init
         , update = update
         , view = view
+        , subscriptions = subscriptions
         }
 
 
@@ -26,6 +27,11 @@ type alias Model =
     {}
 
 
+init : Flags -> ( Model, Cmd Msg )
+init flags =
+    ( initialModel, Cmd.none )
+
+
 initialModel : Model
 initialModel =
     {}
@@ -39,9 +45,9 @@ type Msg
     = Noop
 
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    model
+    ( model, Cmd.none )
 
 
 
@@ -53,3 +59,12 @@ view model =
     Html.section []
         [ Html.h1 [] [ Html.text "D&D damage dice roller" ]
         ]
+
+
+
+-- SUBSCRIPTIONS
+
+
+subscriptions : Model -> Sub a
+subscriptions model =
+    Sub.none
