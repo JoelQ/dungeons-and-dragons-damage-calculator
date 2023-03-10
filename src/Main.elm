@@ -1,12 +1,25 @@
 module Main exposing (main)
 
+import Browser
 import Html exposing (Html)
 import Html.Attributes
 
 
-main : Html a
+main : Program Flags Model Msg
 main =
-    view initialModel
+    Browser.sandbox
+        { init = initialModel
+        , update = update
+        , view = view
+        }
+
+
+
+-- MODEL
+
+
+type alias Flags =
+    ()
 
 
 type alias Model =
@@ -16,6 +29,23 @@ type alias Model =
 initialModel : Model
 initialModel =
     {}
+
+
+
+-- UPDATE
+
+
+type Msg
+    = Noop
+
+
+update : Msg -> Model -> Model
+update msg model =
+    model
+
+
+
+-- VIEW
 
 
 view : Model -> Html a
