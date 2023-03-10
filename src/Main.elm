@@ -26,8 +26,14 @@ type alias Flags =
 
 
 type alias Model =
-    { roll : Int
+    { roll : CompositeRoll
     , modifier : AttackModifier
+    }
+
+
+type alias CompositeRoll =
+    { attacks : List Int
+    , aggregate : Int
     }
 
 
@@ -44,7 +50,7 @@ init flags =
 
 initialModel : Model
 initialModel =
-    { roll = 0
+    { roll = { attacks = [], aggregate = 0 }
     , modifier = Normal
     }
 
@@ -55,7 +61,7 @@ initialModel =
 
 type Msg
     = RollDamage
-    | AttackRolled Int
+    | AttackRolled CompositeRoll
     | ModifierChosen AttackModifier
 
 
@@ -63,7 +69,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         RollDamage ->
-            ( model, Random.generate AttackRolled (attack model.modifier) )
+            ( model, Random.generate AttackRolled (attackGen model.modifier) )
 
         AttackRolled newAttack ->
             ( { model | roll = newAttack }, Cmd.none )
@@ -72,8 +78,8 @@ update msg model =
             ( { model | modifier = newModifier }, Cmd.none )
 
 
-attack : AttackModifier -> Generator Int
-attack modifier =
+attackGen : AttackModifier -> Generator CompositeRoll
+attackGen modifier =
     case modifier of
         Normal ->
             normal
@@ -85,19 +91,26 @@ attack modifier =
             disadvantage
 
 
-normal : Generator Int
+normal : Generator CompositeRoll
 normal =
-    d20
+    Random.map (\roll -> { attacks = [ roll ], aggregate = roll })
+        d20
 
 
-advantage : Generator Int
+advantage : Generator CompositeRoll
 advantage =
-    Random.map2 max d20 d20
+    Random.map2
+        (\roll1 roll2 -> { attacks = [ roll1, roll2 ], aggregate = max roll1 roll2 })
+        d20
+        d20
 
 
-disadvantage : Generator Int
+disadvantage : Generator CompositeRoll
 disadvantage =
-    Random.map2 min d20 d20
+    Random.map2
+        (\roll1 roll2 -> { attacks = [ roll1, roll2 ], aggregate = min roll1 roll2 })
+        d20
+        d20
 
 
 d20 : Generator Int
@@ -143,8 +156,21 @@ view model =
                 ]
             , Html.button [] [ Html.text "Roll Attack" ]
             ]
-        , Html.div [] [ Html.text <| "Rolled: " ++ String.fromInt model.roll ]
+        , viewCompositeRoll model.roll
         ]
+
+
+viewCompositeRoll : CompositeRoll -> Html a
+viewCompositeRoll roll =
+    Html.section []
+        [ Html.p [] [ Html.text <| "Rolled: " ++ String.fromInt roll.aggregate ]
+        , Html.ul [] (List.map viewAttackRoll roll.attacks)
+        ]
+
+
+viewAttackRoll : Int -> Html a
+viewAttackRoll attack =
+    Html.li [] [ Html.text (String.fromInt attack) ]
 
 
 
