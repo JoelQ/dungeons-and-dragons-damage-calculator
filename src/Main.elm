@@ -27,6 +27,7 @@ type alias Flags =
 
 type alias Model =
     { roll : CompositeRoll
+    , damage : Int
     , modifier : AttackModifier
     , enemyAC : Int
     }
@@ -71,6 +72,7 @@ initialModel : Model
 initialModel =
     { roll = { attacks = [], aggregate = 0 }
     , modifier = Normal
+    , damage = 0
     , enemyAC = 10
     }
 
@@ -82,6 +84,7 @@ initialModel =
 type Msg
     = RollDamage
     | AttackRolled CompositeRoll
+    | DamageRolled Int
     | ModifierChosen AttackModifier
 
 
@@ -92,7 +95,19 @@ update msg model =
             ( model, Random.generate AttackRolled (attackGen model.modifier) )
 
         AttackRolled newAttack ->
-            ( { model | roll = newAttack }, Cmd.none )
+            ( { model | roll = newAttack }
+            , Random.generate DamageRolled
+                (damageGen <|
+                    isHit
+                        { roll =
+                            newAttack.aggregate
+                        , ac = model.enemyAC
+                        }
+                )
+            )
+
+        DamageRolled newDamage ->
+            ( { model | damage = newDamage }, Cmd.none )
 
         ModifierChosen newModifier ->
             ( { model | modifier = newModifier }, Cmd.none )
@@ -133,9 +148,47 @@ disadvantage =
         d20
 
 
+damageGen : AttackStatus -> Generator Int
+damageGen status =
+    case status of
+        Crit ->
+            criticalDamage
+
+        Hit ->
+            regularDamage
+
+        Miss ->
+            noDamage
+
+
+criticalDamage : Generator Int
+criticalDamage =
+    Random.map2 (+) d6 d6
+
+
+regularDamage : Generator Int
+regularDamage =
+    d6
+
+
+noDamage : Generator Int
+noDamage =
+    Random.constant 0
+
+
+d6 : Generator Int
+d6 =
+    d 6
+
+
 d20 : Generator Int
 d20 =
-    Random.int 1 20
+    d 20
+
+
+d : Int -> Generator Int
+d n =
+    Random.int 1 n
 
 
 
@@ -159,7 +212,7 @@ view model =
                 ]
             , Html.button [] [ Html.text "Roll Attack" ]
             ]
-        , viewCompositeRoll model.roll model.enemyAC
+        , viewCompositeRoll model.roll model.enemyAC model.damage
         ]
 
 
@@ -174,8 +227,8 @@ radioInput id isChecked msg =
         []
 
 
-viewCompositeRoll : CompositeRoll -> Int -> Html a
-viewCompositeRoll roll enemyAC =
+viewCompositeRoll : CompositeRoll -> Int -> Int -> Html a
+viewCompositeRoll roll enemyAC damage =
     Html.section []
         [ Html.p []
             [ Html.text <|
@@ -186,6 +239,7 @@ viewCompositeRoll roll enemyAC =
                     ++ ")"
             ]
         , Html.ul [] (List.map viewAttackRoll roll.attacks)
+        , Html.p [] [ Html.text <| "Damage: " ++ String.fromInt damage ]
         ]
 
 
