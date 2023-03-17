@@ -130,34 +130,27 @@ view model =
             [ Html.fieldset []
                 [ Html.legend [] [ Html.text "Modifiers" ]
                 , Html.label [ Html.Attributes.for "normal" ] [ Html.text "Normal" ]
-                , Html.input
-                    [ Html.Attributes.id "normal"
-                    , Html.Attributes.type_ "radio"
-                    , Html.Attributes.checked <| model.modifier == Normal
-                    , Html.Events.onCheck (\_ -> ModifierChosen Normal)
-                    ]
-                    []
+                , radioInput "normal" (model.modifier == Normal) (ModifierChosen Normal)
                 , Html.label [ Html.Attributes.for "advantage" ] [ Html.text "Advantage" ]
-                , Html.input
-                    [ Html.Attributes.id "advantage"
-                    , Html.Attributes.type_ "radio"
-                    , Html.Attributes.checked <| model.modifier == Advantage
-                    , Html.Events.onCheck (\_ -> ModifierChosen Advantage)
-                    ]
-                    []
+                , radioInput "advantage" (model.modifier == Advantage) (ModifierChosen Advantage)
                 , Html.label [ Html.Attributes.for "disadvantage" ] [ Html.text "Disadvantage" ]
-                , Html.input
-                    [ Html.Attributes.id "disadvantage"
-                    , Html.Attributes.type_ "radio"
-                    , Html.Attributes.checked <| model.modifier == Disadvantage
-                    , Html.Events.onCheck (\_ -> ModifierChosen Disadvantage)
-                    ]
-                    []
+                , radioInput "disadvantage" (model.modifier == Disadvantage) (ModifierChosen Disadvantage)
                 ]
             , Html.button [] [ Html.text "Roll Attack" ]
             ]
         , viewCompositeRoll model.roll
         ]
+
+
+radioInput : String -> Bool -> Msg -> Html Msg
+radioInput id isChecked msg =
+    Html.input
+        [ Html.Attributes.id id
+        , Html.Attributes.type_ "radio"
+        , Html.Attributes.checked isChecked
+        , Html.Events.onCheck (\_ -> msg)
+        ]
+        []
 
 
 viewCompositeRoll : CompositeRoll -> Html a
