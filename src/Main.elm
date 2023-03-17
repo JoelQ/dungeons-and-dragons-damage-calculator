@@ -28,6 +28,7 @@ type alias Flags =
 type alias Model =
     { roll : CompositeRoll
     , modifier : AttackModifier
+    , enemyAC : Int
     }
 
 
@@ -35,6 +36,24 @@ type alias CompositeRoll =
     { attacks : List Int
     , aggregate : Int
     }
+
+
+type AttackStatus
+    = Miss
+    | Hit
+    | Crit
+
+
+isHit : { roll : Int, ac : Int } -> AttackStatus
+isHit { roll, ac } =
+    if roll == 20 then
+        Crit
+
+    else if roll >= ac then
+        Hit
+
+    else
+        Miss
 
 
 type AttackModifier
@@ -52,6 +71,7 @@ initialModel : Model
 initialModel =
     { roll = { attacks = [], aggregate = 0 }
     , modifier = Normal
+    , enemyAC = 10
     }
 
 
@@ -126,6 +146,7 @@ view : Model -> Html Msg
 view model =
     Html.section []
         [ Html.h1 [] [ Html.text "D&D damage dice roller" ]
+        , Html.p [] [ Html.text <| "AC to beat: " ++ String.fromInt model.enemyAC ]
         , Html.form [ Html.Events.onSubmit RollDamage ]
             [ Html.fieldset []
                 [ Html.legend [] [ Html.text "Modifiers" ]
@@ -138,7 +159,7 @@ view model =
                 ]
             , Html.button [] [ Html.text "Roll Attack" ]
             ]
-        , viewCompositeRoll model.roll
+        , viewCompositeRoll model.roll model.enemyAC
         ]
 
 
@@ -153,12 +174,32 @@ radioInput id isChecked msg =
         []
 
 
-viewCompositeRoll : CompositeRoll -> Html a
-viewCompositeRoll roll =
+viewCompositeRoll : CompositeRoll -> Int -> Html a
+viewCompositeRoll roll enemyAC =
     Html.section []
-        [ Html.p [] [ Html.text <| "Rolled: " ++ String.fromInt roll.aggregate ]
+        [ Html.p []
+            [ Html.text <|
+                "Rolled: "
+                    ++ String.fromInt roll.aggregate
+                    ++ " ("
+                    ++ viewAttackStatus (isHit { roll = roll.aggregate, ac = enemyAC })
+                    ++ ")"
+            ]
         , Html.ul [] (List.map viewAttackRoll roll.attacks)
         ]
+
+
+viewAttackStatus : AttackStatus -> String
+viewAttackStatus status =
+    case status of
+        Crit ->
+            "critical!"
+
+        Hit ->
+            "hit!"
+
+        Miss ->
+            "miss!"
 
 
 viewAttackRoll : Int -> Html a
